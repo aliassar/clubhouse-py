@@ -140,8 +140,10 @@ def print_channel_list(client, max_limit=20):
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("")
     table.add_column("channel_name", style="cyan", justify="right")
-    table.add_column("topic")
+    table.add_column("topic", justify="center",no_wrap=True,max_width=35)
     table.add_column("speaker_count")
+    table.add_column("user_count")
+    table.add_column("club", justify="center",no_wrap=True,max_width=35)
     channels = client.get_feed()['items'] # ['channel']
     i = 0
     for channel in channels:
@@ -151,11 +153,16 @@ def print_channel_list(client, max_limit=20):
             break
         _option = ""
         _option += "\xEE\x85\x84" if channel['is_social_mode'] or channel['is_private'] else ""
+        club = '---'
+        if channel['club']:
+            club = channel['club']['name']
         table.add_row(
             str(_option),
             str(channel['channel']),
             str(channel['topic']),
             str(int(channel['num_speakers'])),
+            str(int(channel['num_all'])),
+            str(club),
         )
     console.print(table)
 
