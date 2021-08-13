@@ -262,6 +262,29 @@ def chat_main(client):
         if RTC:
             token = channel_info['token']
             RTC.joinChannel(token, channel_name, "", int(user_id))
+            working_directory = os.path.abspath(os.getcwd()).replace('\\', '/')
+            recorded_files_path = working_directory + '/' + 'recorded_files' + '/'
+            if not os.path.exists(recorded_files_path):
+                os.mkdir(recorded_files_path)
+            if channel_info['club']:
+                file_name = channel_info['club']['name'] + "----" + channel_info['topic']
+            else:
+                file_name = channel_info['topic']
+            file_name = file_name.replace('\\', '') \
+                .replace('/', '') \
+                .replace(':', '') \
+                .replace('*', '') \
+                .replace('?', '') \
+                .replace('"', '') \
+                .replace('>', '') \
+                .replace('<', '') \
+                .replace('|', '')
+            file_path = recorded_files_path + file_name + '.wav'
+            if os.path.exists(file_path):
+                file_path = recorded_files_path + file_name + '2' + '.wav'
+            print(file_path)
+            if RTC.startAudioRecording(file_path, 48, agorartc.AUDIO_RECORDING_QUALITY_HIGH) < 0:
+                print('Recording Failed')
         else:
             print("[!] Agora SDK is not installed.")
             print("    You may not speak or listen to the conversation.")
@@ -296,6 +319,7 @@ def chat_main(client):
         if _wait_func:
             _wait_func.set()
         if RTC:
+            RTC.stopAudioRecording()
             RTC.leaveChannel()
         client.leave_channel(channel_name)
 
